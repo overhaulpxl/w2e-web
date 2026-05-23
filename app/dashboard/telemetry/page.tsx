@@ -7,7 +7,7 @@ import { Server, Users, Volume2, Shield, Settings, Activity, Crown } from 'lucid
 export default function BotDashboard() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
-  const [apiUrl, setApiUrl] = useState('http://localhost:8081/api/server');
+  const [apiUrl, setApiUrl] = useState('/api/bot/server');
   const [isEditingApi, setIsEditingApi] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
@@ -27,7 +27,7 @@ export default function BotDashboard() {
           setLastUpdated(new Date());
         }
       } catch (err) {
-        setError('Connection failed. Make sure the W2E Bot is running on port 8081.');
+        setError('Connection failed. Make sure the W2E Bot API is accessible.');
       }
     };
 

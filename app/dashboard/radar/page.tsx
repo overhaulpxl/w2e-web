@@ -16,7 +16,7 @@ export default function VoiceRadar() {
 
   const fetchRadar = async () => {
     try {
-      const res = await fetch("http://localhost:8081/api/radar");
+      const res = await fetch("/api/bot/radar");
       const json = await res.json();
       setData(json);
     } catch (err) {

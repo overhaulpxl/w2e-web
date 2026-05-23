@@ -1,13 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Terminal, Send, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function CommandCenter() {
-  const [channel, setChannel] = useState("general");
+  const [channels, setChannels] = useState<{id: string, name: string}[]>([]);
+  const [channel, setChannel] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    fetch("/api/bot/server")
+      .then(r => r.json())
+      .then(data => {
+        if (data.text_channels && data.text_channels.length > 0) {
+          setChannels(data.text_channels);
+          setChannel(data.text_channels[0].id);
+        }
+      })
+      .catch(err => console.error("Failed to load channels:", err));
+  }, []);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,7 +28,7 @@ export default function CommandCenter() {
     
     setStatus("sending");
     try {
-      const res = await fetch("http://localhost:8081/api/broadcast", {
+      const res = await fetch("/api/bot/broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel, message })
@@ -32,7 +45,7 @@ export default function CommandCenter() {
       }
     } catch (err) {
       setStatus("error");
-      setErrorMsg("Failed to connect to Bot API on port 8081");
+      setErrorMsg("Failed to connect to Bot API proxy");
     }
   };
 
@@ -164,10 +177,15 @@ export default function CommandCenter() {
                   className="custom-select" 
                   value={channel} 
                   onChange={(e) => setChannel(e.target.value)}
+                  disabled={channels.length === 0}
                 >
-                  <option value="general">#general (General Chat)</option>
-                  <option value="bhot">#bhot (Bot Testing)</option>
-                  <option value="console">#console (Admin Logs)</option>
+                  {channels.length === 0 ? (
+                    <option value="">Loading channels...</option>
+                  ) : (
+                    channels.map(c => (
+                      <option key={c.id} value={c.id}>#{c.name}</option>
+                    ))
+                  )}
                 </select>
                 <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
                   ▼
@@ -193,7 +211,7 @@ export default function CommandCenter() {
 
             {status === 'success' && (
               <div className="status-msg status-success">
-                <CheckCircle2 size={20} /> Message broadcasted successfully to #{channel}!
+                <CheckCircle2 size={20} /> Message broadcasted successfully!
               </div>
             )}
             {status === 'error' && (
