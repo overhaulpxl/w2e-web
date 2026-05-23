@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: w2e-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: w2e_user
+      POSTGRES_PASSWORD: w2e_password
+      POSTGRES_DB: w2e_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: w2e-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://w2e_user:w2e_password@postgres:5432/w2e_db?schema=public
+      - NEXTAUTH_URL=http://your-vps-ip:3000  # GANTI DENGAN IP VPS / DOMAIN KAMU
+      - NEXTAUTH_SECRET=super_secret_key_123  # GANTI DENGAN RANDOM STRING
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
