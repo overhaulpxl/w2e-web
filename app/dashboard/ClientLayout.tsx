@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Music, Trophy, Terminal, Radio, Sparkles } from "lucide-react";
+import { Music, Trophy, Terminal, Radio, Sparkles, Activity } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
+    { name: "Server Telemetry", path: "/dashboard/telemetry", icon: Activity },
     { name: "Music Player", path: "/dashboard", icon: Music },
     { name: "Leaderboard", path: "/dashboard/leaderboard", icon: Trophy },
     { name: "Command Center", path: "/dashboard/command-center", icon: Terminal },
